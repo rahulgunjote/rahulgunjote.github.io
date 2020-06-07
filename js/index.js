@@ -1,6 +1,8 @@
 var map;
 var infowindow
 var marker
+var circle
+var locationMarkers = []
 const elements = {
     location_lat: document.getElementById("location_lat"),
     location_lng: document.getElementById("location_lng"),
@@ -12,7 +14,9 @@ const elements = {
     location3_lng: document.getElementById("location3_lng"),
     location4_lat: document.getElementById("location4_lat"),
     location4_lng: document.getElementById("location4_lng"),
-    description: document.getElementById('description')
+    description: document.getElementById('description'),
+    btnReset: document.getElementById('btn_reset'),
+    btnTest: document.getElementById('btn_test')
 }
 
 
@@ -21,19 +25,7 @@ function handleForm(event)
 { 
     event.preventDefault(); 
     // console.log('Handling form submission')
-    // elements.location4_lat.value = '-37.5813037'
-    // elements.location4_lng.value = '144.8874391'
-
-    // elements.location1_lat.value = '-37.6965763'
-    // elements.location1_lng.value = '144.7707333'
-
-    // elements.location2_lat.value = '-37.6966858'
-    // elements.location2_lng.value = '144.5080816'
-
-    // elements.location3_lat.value = '-37.7027903'
-    // elements.location3_lng.value = '145.0469404'
-
-
+   
     const lat = parseFloat(elements.location_lat.value.trim())
     const lng = parseFloat(elements.location_lng.value.trim())
     let portLocation
@@ -78,10 +70,7 @@ function handleForm(event)
     const description = elements.description.value
     placeMarker(portLocation, description)
     drawShape(portLocation, markLocations)
-
-
 } 
-
 
 function initMap() {
     var mapOptions = {
@@ -109,20 +98,15 @@ function initMap() {
                 lng: position.coords.longitude
             };
             
-            elements.location_lat.value = `${position.coords.latitude}`
-            elements.location_lng.value = `${position.coords.longitude}`
-
-            //elements.location_lat.value = `-37.6732766`
-            //elements.location_lng.value = `144.846589`
-            //document.getElementById('description').value = 'This is an amazing place to visit'
+            // elements.location_lat.value = `${position.coords.latitude}`
+            // elements.location_lng.value = `${position.coords.longitude}`
             map.setCenter(pos);
-            marker = new google.maps.Marker({
-                // The below line is equivalent to writing:
-                // position: new google.maps.LatLng(-34.397, 150.644)
-                position: pos,
-                map: map
-            });
-            //drawShape(pos)
+            // marker = new google.maps.Marker({
+            //     // The below line is equivalent to writing:
+            //     // position: new google.maps.LatLng(-34.397, 150.644)
+            //     position: pos,
+            //     map: map
+            // });
 
         }, function () {
             handleLocationError(true, infoWindow, map.getCenter());
@@ -133,7 +117,7 @@ function initMap() {
     }
 }
 function placeMarker(location, info) {
-    marker.setMap(null);
+   if(marker) marker.setMap(null);
     marker = new google.maps.Marker({
         // The below line is equivalent to writing:
         // position: new google.maps.LatLng(-34.397, 150.644)
@@ -155,23 +139,18 @@ function placeMarker(location, info) {
         infowindow.close();
     });
 }
-function drawShape(center, locations) {
+function drawShape(center, locations) { 
 
-    console.log("Calculating distance... ")
-
-    // locations = [{ lat: -37.5813037, lng: 144.8874391 },
-    // { lat: -37.6965763, lng: 144.7707333 },
-    // { lat: -37.6966858, lng: 144.5080816 },
-    // { lat: -37.7027903, lng: 145.0469404 }]
+    locationMarkers.forEach(lMarker => lMarker.setMap(null))
+    locationMarkers = []
     
     var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
-
     locations.forEach( l => {
-               new google.maps.Marker({
+      locationMarkers.push(new google.maps.Marker({
                     position: l,
                     map: map,
                     icon: image
-                });
+       }));
     })
     const distances = locations.map(location => {
         const distanceInMeters = google.maps.geometry.spherical.computeDistanceBetween(
@@ -188,8 +167,10 @@ function drawShape(center, locations) {
             radius = 100
         }
     }
-     
-    var circle = new google.maps.Circle({
+    if (circle) {
+       circle.setMap(null)
+    }
+    circle = new google.maps.Circle({
         strokeColor: '#FF0000',
         strokeOpacity: 0.8,
         strokeWeight: 2,
@@ -214,5 +195,37 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
         'Error: Your browser doesn\'t support geolocation.');
     infoWindow.open(map);
 }
+elements.btnReset.addEventListener('click', () => {
 
+    elements.location_lat.value = ''
+    elements.location_lng.value = ''
+    elements.location1_lat.value = ''
+    elements.location1_lng.value = ''
+    elements.location2_lat.value = ''
+    elements.location2_lng.value = ''
+    elements.location3_lat.value = ''
+    elements.location3_lng.value = ''
+    elements.location4_lat.value = ''
+    elements.location4_lng.value = ''
+    elements.description.value = ''
+})
+elements.btnTest.addEventListener('click', () => {
+     
+    elements.location_lat.value = '-37.673277'
+    elements.location_lng.value = '144.8312681'
+
+     elements.location1_lat.value = '-37.6732783'
+     elements.location1_lng.value = '144.8137586'
+
+     elements.location2_lat.value = '-37.6779531'
+     elements.location2_lng.value = '144.823938'
+
+     elements.location3_lat.value = '-37.6732766'
+     elements.location3_lng.value = '144.846589'
+
+     elements.location4_lat.value = '-37.6729114'
+     elements.location4_lng.value = '144.8336607'
+
+     elements.description.value = 'Large airport with an international and 4 domestic terminals that operate 24 hours a day.'
+})
 form.addEventListener('submit', handleForm);
