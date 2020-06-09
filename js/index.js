@@ -27,45 +27,44 @@ DMSFormattedString = (decimalString) => {
 
     if (decimalString.split('.')[0].length > 6) {
         //1302648.5 will be formatted to 130° 26' 48.5"
-        degrees = decimalString.substring(0,3)
-        minutes = decimalString.substring(3,5)
+        degrees = decimalString.substring(0, 3)
+        minutes = decimalString.substring(3, 5)
         seconds = decimalString.slice(5)
-    }else {
+    } else {
         //333517.8 will be formatted to 33° 35' 17.8"
-        degrees = decimalString.substring(0,2)
-        minutes = decimalString.substring(2,4)
+        degrees = decimalString.substring(0, 2)
+        minutes = decimalString.substring(2, 4)
         seconds = decimalString.slice(4)
     }
     return `${degrees}° ${minutes}' ${seconds}"`
 }
 function locationFromInput(latValue, lngValue) {
     let geoPoint
-    if(latValue && lngValue) {
+    if (latValue && lngValue) {
         //If input is in DMS format like 333517.8, 1302648.5, then convert it into decimal coordinate format using GeoPoint 
-        if(latValue.split('.')[0].length > 3 && lngValue.split('.')[0].length > 3) {
+        if (latValue.split('.')[0].length > 3 && lngValue.split('.')[0].length > 3) {
             geoPoint = new GeoPoint(
-                DMSFormattedString(lngValue), 
+                DMSFormattedString(lngValue),
                 DMSFormattedString(latValue))
-        }else {
+        } else {
             const lat = parseFloat(latValue)
             const lng = parseFloat(lngValue)
             geoPoint = new GeoPoint(lng, lat)
         }
         if (geoPoint) {
-            return {lat: geoPoint.getLatDec(), lng: geoPoint.getLonDec()}
+            return { lat: geoPoint.getLatDec(), lng: geoPoint.getLonDec() }
         }
     }
     return geoPoint
-   
+
 }
-function handleForm(event) 
-{ 
-    event.preventDefault(); 
+function handleForm(event) {
+    event.preventDefault();
     // console.log('Handling form submission')
-   
+
     const latValue = elements.location_lat.value.trim()
     const lngValue = elements.location_lng.value.trim()
-    
+
     let portLocation = locationFromInput(latValue, lngValue)
     if (!portLocation) {
         alert('Invalid Port Location')
@@ -75,43 +74,44 @@ function handleForm(event)
     const lat1 = elements.location1_lat.value.trim()
     const lng1 = elements.location1_lng.value.trim()
     let location1 = locationFromInput(lat1, lng1)
-    if(location1) markLocations.push(location1)
+    if (location1) markLocations.push(location1)
     console.log(`Location 1: ${location1}`)
 
     const lat2 = elements.location2_lat.value.trim()
     const lng2 = elements.location2_lng.value.trim()
     let location2 = locationFromInput(lat2, lng2)
-    if(location2) markLocations.push(location2)
+    if (location2) markLocations.push(location2)
 
     const lat3 = elements.location3_lat.value.trim()
     const lng3 = elements.location3_lng.value.trim()
     let location3 = locationFromInput(lat3, lng3)
-    if(location3) markLocations.push(location3)
+    if (location3) markLocations.push(location3)
 
     const lat4 = elements.location4_lat.value.trim()
     const lng4 = elements.location4_lng.value.trim()
     let location4 = locationFromInput(lat4, lng4)
-    if(location4) markLocations.push(location4)
+    if (location4) markLocations.push(location4)
 
     const description = elements.description.value
     placeMarker(portLocation, description)
     drawShape(portLocation, markLocations)
-} 
+}
 
 function initMap() {
     var mapOptions = {
         zoom: 10,
-        center: { lat: -37.8170652, lng: 144.9419122},
+        center: { lat: -37.8170652, lng: 144.9419122 },
+        mapTypeId: 'satellite',
         mapTypeControl: true,
-          mapTypeControlOptions: {
-              style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-              position: google.maps.ControlPosition.TOP_CENTER
-          },
-          zoomControl: true,
-          zoomControlOptions: {
-              position: google.maps.ControlPosition.RIGHT_BOTTOM
-          },
-          scaleControl: true,
+        mapTypeControlOptions: {
+            style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+            position: google.maps.ControlPosition.TOP_CENTER
+        },
+        zoomControl: true,
+        zoomControlOptions: {
+            position: google.maps.ControlPosition.RIGHT_BOTTOM
+        },
+        scaleControl: true,
     };
     map = new google.maps.Map(document.getElementById('map'),
         mapOptions);
@@ -123,7 +123,7 @@ function initMap() {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
             };
-            
+
             // elements.location_lat.value = `${position.coords.latitude}`
             // elements.location_lng.value = `${position.coords.longitude}`
             map.setCenter(pos);
@@ -143,7 +143,7 @@ function initMap() {
     }
 }
 function placeMarker(location, info) {
-   if(marker) marker.setMap(null);
+    if (marker) marker.setMap(null);
     marker = new google.maps.Marker({
         // The below line is equivalent to writing:
         // position: new google.maps.LatLng(-34.397, 150.644)
@@ -157,36 +157,36 @@ function placeMarker(location, info) {
     marker.addListener('click', function () {
         infowindow.open(map, marker);
     });
-    marker.addListener('mouseover', function() {
+    marker.addListener('mouseover', function () {
         infowindow.open(map, this);
     });
     // assuming you also want to hide the infowindow when user mouses-out
-    marker.addListener('mouseout', function() {
+    marker.addListener('mouseout', function () {
         infowindow.close();
     });
 }
-function drawShape(portLocation,locations) {
-     if(shape) {
-         shape.setMap(null)
-     }
+function drawShape(portLocation, locations) {
+    if (shape) {
+        shape.setMap(null)
+    }
 
-     var bounds = new google.maps.LatLngBounds();
-     bounds.extend(new google.maps.LatLng(portLocation.lat,portLocation.lng))
-     locations.forEach(location => {
-         bounds.extend(new google.maps.LatLng(location.lat,location.lng))
-     })
+    var bounds = new google.maps.LatLngBounds();
+    bounds.extend(new google.maps.LatLng(portLocation.lat, portLocation.lng))
+    locations.forEach(location => {
+        bounds.extend(new google.maps.LatLng(location.lat, location.lng))
+    })
 
-     shape = new google.maps.Polygon({
+    shape = new google.maps.Polygon({
         paths: locations,
         strokeColor: '#FF0000',
         strokeOpacity: 0.8,
         strokeWeight: 2,
         fillColor: '#FF0000',
         fillOpacity: 0.35
-      });
-      shape.setMap(map);
-      map.fitBounds(bounds);
-      //map.setCenter(portLocation);
+    });
+    shape.setMap(map);
+    map.fitBounds(bounds);
+    //map.setCenter(portLocation);
 }
 /*
 function drawCircle(center, locations) { 
@@ -260,7 +260,7 @@ elements.btnReset.addEventListener('click', () => {
     elements.description.value = ''
 })
 elements.btnTest.addEventListener('click', () => {
-     
+
     // elements.location_lat.value = '-37.673277'
     // elements.location_lng.value = '144.831268'
 
@@ -275,22 +275,22 @@ elements.btnTest.addEventListener('click', () => {
 
     //  elements.location4_lat.value = '-37.6729114'
     //  elements.location4_lng.value = '144.8336607'
-   
+
     elements.location_lat.value = '33.5903'
     elements.location_lng.value = '130.4467'
 
-     elements.location1_lat.value = '333517.8'
-     elements.location1_lng.value = '1302648.5'
+    elements.location1_lat.value = '333517.8'
+    elements.location1_lng.value = '1302648.5'
 
-     elements.location2_lat.value = '333505.2'
-     elements.location2_lng.value = '1302657.1'
+    elements.location2_lat.value = '333505.2'
+    elements.location2_lng.value = '1302657.1'
 
-     elements.location3_lat.value = '333505.0'
-     elements.location3_lng.value = '1302656.6'
+    elements.location3_lat.value = '333505.0'
+    elements.location3_lng.value = '1302656.6'
 
-     elements.location4_lat.value = '333517.5'
-     elements.location4_lng.value = '1302648.0'
+    elements.location4_lat.value = '333517.5'
+    elements.location4_lng.value = '1302648.0'
 
-     elements.description.value = 'VEHICLE EXIST BLW TRANSITIONAL SFC-1.PSN     : BOUNDED BY FLW POINT-333517.8N1302648.5E 333505.2N1302657.1E-333505.0N1302656.6E 333517.5N1302648.0E-(988.5M TO 1445.0M BEYOND RWY 16 THR AND-184.0M TO 198.1M RIGHT RCL)-2.NUMBER  : MAX 33-3.RMK     : (1) WX MNM-INSTRUMENT APCH PROC-DEP PROC NO CHANGE-(2) OBST LGT INSTL-F)SFC G)38FT AMSL)-'
+    elements.description.value = 'VEHICLE EXIST BLW TRANSITIONAL SFC-1.PSN     : BOUNDED BY FLW POINT-333517.8N1302648.5E 333505.2N1302657.1E-333505.0N1302656.6E 333517.5N1302648.0E-(988.5M TO 1445.0M BEYOND RWY 16 THR AND-184.0M TO 198.1M RIGHT RCL)-2.NUMBER  : MAX 33-3.RMK     : (1) WX MNM-INSTRUMENT APCH PROC-DEP PROC NO CHANGE-(2) OBST LGT INSTL-F)SFC G)38FT AMSL)-'
 })
 form.addEventListener('submit', handleForm);
