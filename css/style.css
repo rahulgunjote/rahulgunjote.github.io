@@ -94,7 +94,9 @@ a[aria-expanded="true"] {
 a[data-toggle="collapse"] {
     position: relative;
 }
-
+.radio_lable {
+    color: black;
+}
 .dropdown-toggle::after {
     display: block;
     position: absolute;

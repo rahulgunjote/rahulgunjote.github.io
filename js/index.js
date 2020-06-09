@@ -2,6 +2,7 @@ var map;
 var infowindow
 var marker
 var circle
+var shape
 var locationMarkers = []
 const elements = {
     location_lat: document.getElementById("location_lat"),
@@ -21,50 +22,75 @@ const elements = {
 
 
 var form = document.getElementById("search");
+DMSFormattedString = (decimalString) => {
+    let degrees, minutes, seconds
+
+    if (decimalString.split('.')[0].length > 6) {
+        //1302648.5 will be formatted to 130° 26' 48.5"
+        degrees = decimalString.substring(0,3)
+        minutes = decimalString.substring(3,5)
+        seconds = decimalString.slice(5)
+    }else {
+        //333517.8 will be formatted to 33° 35' 17.8"
+        degrees = decimalString.substring(0,2)
+        minutes = decimalString.substring(2,4)
+        seconds = decimalString.slice(4)
+    }
+    return `${degrees}° ${minutes}' ${seconds}"`
+}
+function locationFromInput(latValue, lngValue) {
+    let geoPoint
+    if(latValue && lngValue) {
+        //If input is in DMS format like 333517.8, 1302648.5, then convert it into decimal coordinate format using GeoPoint 
+        if(latValue.split('.')[0].length > 3 && lngValue.split('.')[0].length > 3) {
+            geoPoint = new GeoPoint(
+                DMSFormattedString(lngValue), 
+                DMSFormattedString(latValue))
+        }else {
+            const lat = parseFloat(latValue)
+            const lng = parseFloat(lngValue)
+            geoPoint = new GeoPoint(lng, lat)
+        }
+        if (geoPoint) {
+            return {lat: geoPoint.getLatDec(), lng: geoPoint.getLonDec()}
+        }
+    }
+    return geoPoint
+   
+}
 function handleForm(event) 
 { 
     event.preventDefault(); 
     // console.log('Handling form submission')
    
-    const lat = parseFloat(elements.location_lat.value.trim())
-    const lng = parseFloat(elements.location_lng.value.trim())
-    let portLocation
-    if (lat && lng) {
-       portLocation = {lat: lat, lng: lng}
+    const latValue = elements.location_lat.value.trim()
+    const lngValue = elements.location_lng.value.trim()
+    
+    let portLocation = locationFromInput(latValue, lngValue)
+    if (!portLocation) {
+        alert('Invalid Port Location')
     }
 
     let markLocations = []
-    const lat1 = parseFloat(elements.location1_lat.value.trim())
-    const lng1 = parseFloat(elements.location1_lng.value.trim())
-    let location1
-    if (lat1 && lng1) {
-       location1 = {lat: lat1, lng: lng1}
-    }
+    const lat1 = elements.location1_lat.value.trim()
+    const lng1 = elements.location1_lng.value.trim()
+    let location1 = locationFromInput(lat1, lng1)
     if(location1) markLocations.push(location1)
     console.log(`Location 1: ${location1}`)
 
-    const lat2 = parseFloat(elements.location2_lat.value.trim())
-    const lng2 = parseFloat(elements.location2_lng.value.trim())
-    let location2
-    if (lat2 && lng2) {
-       location2 = {lat: lat2, lng: lng2}
-    }
+    const lat2 = elements.location2_lat.value.trim()
+    const lng2 = elements.location2_lng.value.trim()
+    let location2 = locationFromInput(lat2, lng2)
     if(location2) markLocations.push(location2)
 
-    const lat3 = parseFloat(elements.location3_lat.value.trim())
-    const lng3 = parseFloat(elements.location3_lng.value.trim())
-    let location3
-    if (lat3 && lng3) {
-        location3 = {lat: lat3, lng: lng3}
-    }
+    const lat3 = elements.location3_lat.value.trim()
+    const lng3 = elements.location3_lng.value.trim()
+    let location3 = locationFromInput(lat3, lng3)
     if(location3) markLocations.push(location3)
 
-    const lat4 = parseFloat(elements.location4_lat.value.trim())
-    const lng4 = parseFloat(elements.location4_lng.value.trim())
-    let location4
-    if (lat4 && lng4) {
-       location4 = {lat: lat4, lng: lng4}
-    }
+    const lat4 = elements.location4_lat.value.trim()
+    const lng4 = elements.location4_lng.value.trim()
+    let location4 = locationFromInput(lat4, lng4)
     if(location4) markLocations.push(location4)
 
     const description = elements.description.value
@@ -139,7 +165,31 @@ function placeMarker(location, info) {
         infowindow.close();
     });
 }
-function drawShape(center, locations) { 
+function drawShape(portLocation,locations) {
+     if(shape) {
+         shape.setMap(null)
+     }
+
+     var bounds = new google.maps.LatLngBounds();
+     bounds.extend(new google.maps.LatLng(portLocation.lat,portLocation.lng))
+     locations.forEach(location => {
+         bounds.extend(new google.maps.LatLng(location.lat,location.lng))
+     })
+
+     shape = new google.maps.Polygon({
+        paths: locations,
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35
+      });
+      shape.setMap(map);
+      map.fitBounds(bounds);
+      //map.setCenter(portLocation);
+}
+/*
+function drawCircle(center, locations) { 
 
     locationMarkers.forEach(lMarker => lMarker.setMap(null))
     locationMarkers = []
@@ -187,7 +237,7 @@ function drawShape(center, locations) {
     map.setCenter(center);
 
 }
-
+*/
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
     infoWindow.setPosition(pos);
     infoWindow.setContent(browserHasGeolocation ?
@@ -211,21 +261,36 @@ elements.btnReset.addEventListener('click', () => {
 })
 elements.btnTest.addEventListener('click', () => {
      
-    elements.location_lat.value = '-37.673277'
-    elements.location_lng.value = '144.8312681'
+    // elements.location_lat.value = '-37.673277'
+    // elements.location_lng.value = '144.831268'
 
-     elements.location1_lat.value = '-37.6732783'
-     elements.location1_lng.value = '144.8137586'
+    //  elements.location1_lat.value = '-37.6732783'
+    //  elements.location1_lng.value = '144.8137586'
 
-     elements.location2_lat.value = '-37.6779531'
-     elements.location2_lng.value = '144.823938'
+    //  elements.location2_lat.value = '-37.6779531'
+    //  elements.location2_lng.value = '144.823938'
 
-     elements.location3_lat.value = '-37.6732766'
-     elements.location3_lng.value = '144.846589'
+    //  elements.location3_lat.value = '-37.6732766'
+    //  elements.location3_lng.value = '144.846589'
 
-     elements.location4_lat.value = '-37.6729114'
-     elements.location4_lng.value = '144.8336607'
+    //  elements.location4_lat.value = '-37.6729114'
+    //  elements.location4_lng.value = '144.8336607'
+   
+    elements.location_lat.value = '33.5903'
+    elements.location_lng.value = '130.4467'
 
-     elements.description.value = 'Large airport with an international and 4 domestic terminals that operate 24 hours a day.'
+     elements.location1_lat.value = '333517.8'
+     elements.location1_lng.value = '1302648.5'
+
+     elements.location2_lat.value = '333505.2'
+     elements.location2_lng.value = '1302657.1'
+
+     elements.location3_lat.value = '333505.0'
+     elements.location3_lng.value = '1302656.6'
+
+     elements.location4_lat.value = '333517.5'
+     elements.location4_lng.value = '1302648.0'
+
+     elements.description.value = 'VEHICLE EXIST BLW TRANSITIONAL SFC-1.PSN     : BOUNDED BY FLW POINT-333517.8N1302648.5E 333505.2N1302657.1E-333505.0N1302656.6E 333517.5N1302648.0E-(988.5M TO 1445.0M BEYOND RWY 16 THR AND-184.0M TO 198.1M RIGHT RCL)-2.NUMBER  : MAX 33-3.RMK     : (1) WX MNM-INSTRUMENT APCH PROC-DEP PROC NO CHANGE-(2) OBST LGT INSTL-F)SFC G)38FT AMSL)-'
 })
 form.addEventListener('submit', handleForm);

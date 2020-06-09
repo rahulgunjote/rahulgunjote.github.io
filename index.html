@@ -31,11 +31,11 @@
                 <h4>Port Location</h4>
                 <div class="form-row">
                     <div class="col-md-6 mb-3">
-                        <input type="number" max="90" min="-90" step="any" class="form-control" id="location_lat"
+                        <input type="number"  step="any" class="form-control" id="location_lat"
                             placeholder="Latitude" required>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <input type="number" max="180" min="-180" step="any" class="form-control" id="location_lng"
+                        <input type="number" step="any" class="form-control" id="location_lng"
                             placeholder="Longitude" required>
                     </div>
                 </div>
@@ -43,41 +43,41 @@
                 <h4>Surrounding Locations</h4>
                 <div class="form-row">
                     <div class="col-md-6 mb-3">
-                        <input type="number" max="90" min="-90" step="any" class="form-control" id="location1_lat"
+                        <input type="number"  step="any" class="form-control" id="location1_lat"
                             placeholder="Latitude">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <input type="number" max="180" min="-180" step="any" class="form-control" id="location1_lng"
+                        <input type="number"  step="any" class="form-control" id="location1_lng"
                             placeholder="Longitude">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="col-md-6 mb-3">
-                        <input type="number" max="90" min="-90" step="any" class="form-control" id="location2_lat"
+                        <input type="number"  step="any" class="form-control" id="location2_lat"
                             placeholder="Latitude">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <input type="number" max="180" min="-180" step="any" class="form-control" id="location2_lng"
+                        <input type="number" step="any" class="form-control" id="location2_lng"
                             placeholder="Longitude">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="col-md-6 mb-3">
-                        <input type="number" max="90" min="-90" step="any" class="form-control" id="location3_lat"
+                        <input type="number"  step="any" class="form-control" id="location3_lat"
                             placeholder="Latitude">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <input type="number" max="180" min="-180" step="any" class="form-control" id="location3_lng"
+                        <input type="number"  step="any" class="form-control" id="location3_lng"
                             placeholder="Longitude">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="col-md-6 mb-3">
-                        <input type="number" max="90" min="-90" step="any" class="form-control" id="location4_lat"
+                        <input type="number"  step="any" class="form-control" id="location4_lat"
                             placeholder="Latitude">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <input type="number" max="180" min="-180" step="any" class="form-control" id="location4_lng"
+                        <input type="number"  step="any" class="form-control" id="location4_lng"
                             placeholder="Longitude">
                     </div>
                 </div>
@@ -99,11 +99,11 @@
                         <button type="button" id="btn_reset" class="btn btn-info">Reset</button>
                     </div>
                 </div>
-                <br/>
-                <br/>
-                
+                <br />
+                <br />
+
                 <button type="button" id="btn_test">Populate dummy data (for testing)</button>
-                
+
             </form>
         </div>
         <!-- MAP  -->
@@ -122,6 +122,7 @@
         integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
         crossorigin="anonymous"></script>
     <script src="./js/index.js"></script>
+    <script type="text/javascript" src="./js/geopoint.js"></script>
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpNTypfhghTAYk2_HneWjgAGwJGMpk2Vs&callback=initMap&libraries=geometry">
         </script>
